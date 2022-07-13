@@ -48,7 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'users'
+    'users',
+    'adresses',
+    'categories',
+    'reviews',
+    'services'
 ]
 
 MIDDLEWARE = [
@@ -101,7 +105,7 @@ else:
             "NAME": os.environ.get("POSTGRES_DB"),
             "USER": os.environ.get("POSTGRES_USER"),
             "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-            "HOST": "db",
+            "HOST": "localhost",
             "PORT": 5432,
         }
     }  
