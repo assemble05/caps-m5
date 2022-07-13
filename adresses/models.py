@@ -9,4 +9,3 @@ class Address(models.Model):
     number = models.PositiveIntegerField()
     complementet = models.CharField(max_length=255)
     zipCode = models.CharField(max_length=12)
-
