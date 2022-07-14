@@ -3,7 +3,7 @@ import uuid
 from django.db import models
 
 
-class ReviewStars(models.TextChoices):
+class ReviewStars(models.IntegerChoices):
     ONE = 1
     TWO = 2
     THREE = 3
