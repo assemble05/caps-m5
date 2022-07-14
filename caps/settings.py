@@ -36,7 +36,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://caps-m5.herokuapp.com", "localhost"]
+ALLOWED_HOSTS = ["caps-m5.herokuapp.com", "localhost"]
 
 
 # Application definition
@@ -110,7 +110,7 @@ else:
             "PORT": 5432,
         }
     }
-      
+
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 if DATABASE_URL:
