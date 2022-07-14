@@ -4,7 +4,7 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from users.models import User
-from users.serializers import UserLoginSerializer, UserRegisterSerializer
+from users.serializers import UserLoginSerializer, UserRegisterSerializer, UserSerializer
 
 
 class LoginView(APIView):
@@ -19,7 +19,6 @@ class LoginView(APIView):
 
         if user:
             token, _ = Token.objects.get_or_create(user=user)
-
             return Response({"token": token.key})
 
         return Response(
@@ -31,3 +30,7 @@ class LoginView(APIView):
 class ListCreateAccount(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
+
+class ListAccountDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
