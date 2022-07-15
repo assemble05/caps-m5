@@ -3,8 +3,14 @@ from rest_framework.views import APIView, Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from users.models import User
-from users.serializers import UserLoginSerializer, UserRegisterSerializer, UserSerializer
+from users.serializers import (
+    UserLoginSerializer,
+    UserRegisterSerializer,
+    UserSerializer,
+)
 
 
 class LoginView(APIView):
@@ -31,6 +37,11 @@ class ListCreateAccount(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
 
+
 class ListAccountDetail(generics.RetrieveAPIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
