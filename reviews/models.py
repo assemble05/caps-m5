@@ -20,6 +20,9 @@ class Review(models.Model):
     user_criticized = models.ForeignKey(
         "users.User", on_delete=models.CASCADE, related_name="critics"
     )
+    service = models.ForeignKey(
+        "services.Service", on_delete=models.CASCADE, related_name="reviews"
+    )
     stars = models.PositiveIntegerField(
         choices=ReviewStars.choices, default=ReviewStars.THREE
     )

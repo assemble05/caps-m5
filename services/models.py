@@ -13,8 +13,8 @@ class Service(models.Model):
     is_delete = models.BooleanField(default=False)
     id_provider = models.CharField(max_length=255, null=True)
 
-    address = models.OneToOneField(
-        "adresses.Address", on_delete=models.CASCADE, null=True
+    address = models.ForeignKey(
+        "adresses.Address", on_delete=models.CASCADE, related_name="services", null=True
     )
     category = models.ForeignKey(
         "categories.Category",
