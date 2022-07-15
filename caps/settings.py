@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import dotenv
 import environ
+import dj_database_url
 dotenv.load_dotenv()
 
 env = environ.Env(
@@ -35,7 +36,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["caps-m5.herokuapp.com", "localhost"]
 
 
 # Application definition
@@ -109,7 +110,14 @@ else:
             "HOST": "localhost",
             "PORT": 5432,
         }
-    }  
+    }
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    db_from_env = dj_database_url.config(
+        default=DATABASE_URL, conn_max_age=500, ssl_require=True)
+    DATABASES['default'].update(db_from_env)
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 

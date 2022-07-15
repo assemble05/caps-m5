@@ -49,3 +49,4 @@ class AddressModelTest(TestCase):
         self.assertIsNotNone(self.address.zip_code)
         self.assertIsNotNone(self.address.number)
 
+
