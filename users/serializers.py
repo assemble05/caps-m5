@@ -19,8 +19,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict):
         address_data = validated_data.pop("address")
-        address , check= Address.objects.get_or_create(**address_data)
-        ipdb.set_trace()
+        address , check= Address.objects.get_or_create(**address_data) 
         user = User.objects.create_user(**validated_data,address=address)
         
    
