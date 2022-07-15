@@ -11,21 +11,40 @@ class CriticSerializer(serializers.ModelSerializer):
         read_only_fields = ["first_name", "last_name"]
 
 
-class CreateReviewSerializer(serializers.ModelSerializer):
+class ReviewSerializer(serializers.ModelSerializer):
     user_critic = CriticSerializer(read_only=True)
     user_criticized = CriticSerializer(read_only=True)
 
     class Meta:
         model = Review
-        fields = ["id", "stars", "description"]
-
-    # critic = serializers.SerializerMethodField()
-    # criticized = serializers.SerializerMethodField()
+        fields = ["id", "stars", "description", "user_critic", "user_criticized"]
 
 
-#
-# def get_critic(self, review: Review):
-# return f"{review.user_critic.first_name} {review.user_critic.last_name}"
-#
-# def get_criticized(self, review: Review):
-# return f"{review.user_criticized.first_name} {review.user_criticized.last_name}"
+class UpdateReviewSerializer(serializers.ModelSerializer):
+    user_critic = CriticSerializer(read_only=True)
+    user_criticized = CriticSerializer(read_only=True)
+    user_criticized_id = serializers.UUIDField(write_only=True)
+
+    class Meta:
+        model = Review
+        fields = [
+            "id",
+            "stars",
+            "description",
+            "user_critic",
+            "user_criticized_id",
+            "user_criticized",
+        ]
+
+    def update(self, instance, validated_data):
+
+        if "user_criticized_id" in validated_data.keys():
+            user_criticized_id = validated_data.pop("user_criticized_id")
+            instance.user_criticized = User.objects.get(id=user_criticized_id)
+            instance.save()
+
+        for key, val in validated_data.items():
+            setattr(instance, key, val)
+        instance.save()
+
+        return instance
