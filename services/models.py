@@ -20,6 +20,12 @@ class Service(models.Model):
         null=True,
     )
 
+    contractor = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="created_services",
+    )
+
     address = models.ForeignKey(
         "adresses.Address", on_delete=models.CASCADE, related_name="services", null=True
     )
