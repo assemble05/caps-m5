@@ -16,12 +16,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = [
+            "id",
             "password",
             "first_name",
             "last_name",
             "is_provider",
             "description",
-            "phone",
             "email",
             "address",
         ]
@@ -30,8 +30,24 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict):
         address_data = validated_data.pop("address")
-        address, _ = Address.objects.get_or_create(**address_data)
+        address, check = Address.objects.get_or_create(**address_data)
         ipdb.set_trace()
         user = User.objects.create_user(**validated_data, address=address)
 
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    address = AddressSerializer()
+
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "is_provider",
+            "description",
+            "email",
+            "address",
+            "phone",
+        ]
