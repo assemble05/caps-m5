@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from adresses.models import Address
 from adresses.serializers import AddressSerializer
 
 from users.models import User
@@ -16,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ServiceSerializer(serializers.ModelSerializer):
     contractor = UserSerializer(read_only=True)
-    adresses = AddressSerializer()
+    address = AddressSerializer()
     #category = CategorySerializer()
 
     class Meta:
@@ -30,7 +31,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "address"
         ]
 
-    # def create(self, instance, validated_data):
+    def create(self, validated_data: dict):
         """ 
             Quero gravar o address
             - se não tiver irá pegar no contrante
@@ -39,7 +40,11 @@ class ServiceSerializer(serializers.ModelSerializer):
                 - se não cria outro
                 
         """
-    #    if not validated_data.adresses:
-    #       ...
+        address_data = validated_data.pop("address")
+        address , check= Address.objects.get_or_create(**address_data) 
+        service = Service.objects.create(**validated_data,address=address)
+        
+   
+        return service
 
 
