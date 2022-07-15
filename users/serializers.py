@@ -1,8 +1,9 @@
-from rest_framework import serializers
-from users.models import User
-from adresses.models import Address 
-from adresses.serializers import AddressSerializer
 import ipdb
+from adresses.models import Address
+from adresses.serializers import AddressSerializer
+from rest_framework import serializers
+
+from users.models import User
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -12,8 +13,18 @@ class UserLoginSerializer(serializers.Serializer):
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
+
     class Meta:
-        fields = ["id","password","first_name","last_name","is_provider","description","email","address"]
+        fields = [
+            "id",
+            "password",
+            "first_name",
+            "last_name",
+            "is_provider",
+            "description",
+            "email",
+            "address",
+        ]
         model = User
         extra_kwargs = {"password": {"write_only": True}}
 
@@ -25,8 +36,18 @@ class UserRegisterSerializer(serializers.ModelSerializer):
    
         return user
 
+
 class UserSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
+
     class Meta:
         model = User
-        fields = ["first_name","last_name","is_provider","description","email","address","phone"]
+        fields = [
+            "first_name",
+            "last_name",
+            "is_provider",
+            "description",
+            "email",
+            "address",
+            "phone",
+        ]
