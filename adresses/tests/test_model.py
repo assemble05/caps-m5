@@ -47,4 +47,6 @@ class AddressModelTest(TestCase):
         self.assertIsNotNone(self.address.street)
         self.assertIsNotNone(self.address.state)
         self.assertIsNotNone(self.address.zip_code)
+        self.assertIsNotNone(self.address.number)
+
 
