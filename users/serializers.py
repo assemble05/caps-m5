@@ -1,8 +1,9 @@
-from rest_framework import serializers
-from users.models import User
-from adresses.models import Address 
-from adresses.serializers import AddressSerializer
 import ipdb
+from adresses.models import Address
+from adresses.serializers import AddressSerializer
+from rest_framework import serializers
+
+from users.models import User
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -12,16 +13,25 @@ class UserLoginSerializer(serializers.Serializer):
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
+
     class Meta:
-        fields = ["password","first_name","last_name","is_provider","description","phone","email","address"]
+        fields = [
+            "password",
+            "first_name",
+            "last_name",
+            "is_provider",
+            "description",
+            "phone",
+            "email",
+            "address",
+        ]
         model = User
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
         address_data = validated_data.pop("address")
-        address , _= Address.objects.get_or_create(**address_data)
+        address, _ = Address.objects.get_or_create(**address_data)
         ipdb.set_trace()
-        user = User.objects.create_user(**validated_data,address=address)
-        
-   
+        user = User.objects.create_user(**validated_data, address=address)
+
         return user
