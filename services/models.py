@@ -27,8 +27,12 @@ class Service(models.Model):
     )
 
     address = models.ForeignKey(
-        "adresses.Address", on_delete=models.CASCADE, related_name="services", null=True
+        "adresses.Address", 
+        on_delete=models.CASCADE, 
+        related_name="services", 
+        null=True
     )
+    
     category = models.ForeignKey(
         "categories.Category",
         on_delete=models.SET_NULL,
