@@ -1,12 +1,12 @@
 from rest_framework import permissions
+from services.models import Service
 
 
 class IsInTheServicePermission(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        import ipdb
+    def has_permission(self, request, view):
+        service = Service.objects.get(id=view.kwargs["id_service"])
 
-        ipdb.set_trace()
-        return super().has_object_permission(request, view, obj)
+        return request.user == service.provider or request.user == service.contractor
 
 
 class OwnerOrAdmPermission(permissions.BasePermission):
