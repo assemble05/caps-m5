@@ -57,4 +57,4 @@ class ReviewParamsView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
-    lookup_url_kwarg = "id_user"
+    lookup_url_kwarg = "id_review"
