@@ -4,10 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from services.models import Service
 from users.models import User
 
-from .mixins import SerializerByMethodMixin
 from .models import Review
 from .permissions import IsInTheServicePermission, OwnerOrAdmPermission
-from .serializers import ReviewSerializer, UpdateReviewSerializer
+from .serializers import ReviewSerializer
 
 
 # Create your views here.
@@ -52,14 +51,10 @@ class CreateReviewView(generics.CreateAPIView):
             )
 
 
-class ReviewParamsView(SerializerByMethodMixin, generics.RetrieveUpdateDestroyAPIView):
+class ReviewParamsView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [OwnerOrAdmPermission]
 
     queryset = Review.objects.all()
-    serializer_map = {
-        "GET": ReviewSerializer,
-        "DELETE": ReviewSerializer,
-        "PATCH": UpdateReviewSerializer,
-    }
+    serializer_class = ReviewSerializer
 
-    lookup_url_kwarg = "id_user"
+    lookup_url_kwarg = "id_review"

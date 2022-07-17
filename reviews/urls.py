@@ -8,5 +8,5 @@ urlpatterns = [
     path(
         "accounts/<id_user>/received_reviews/", views.ListReceivedReviewView.as_view()
     ),
-    path("reviews/<id_user>/", views.ReviewParamsView.as_view()),
+    path("reviews/<id_review>/", views.ReviewParamsView.as_view()),
 ]
