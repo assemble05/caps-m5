@@ -1,81 +1,134 @@
-# from rest_framework.authtoken.models import Token
-# from rest_framework.test import APITestCase
-# from reviews.models import Review
-# from reviews.serializers import ReviewSerializer, UpdateReviewSerializer
-# from users.models import User
-# from users.serializers import UserRegisterSerializer
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
+from reviews.models import Review
+from reviews.serializers import ReviewSerializer, UpdateReviewSerializer
+from services.models import Service
+from users.models import User
+from users.serializers import UserRegisterSerializer
 
 
-# class ReviewCreateViewTest(APITestCase):
-#     @classmethod
-#     def setUpTestData(cls):
-#         cls.user_critic = User.objects.create_user(
-#             email="goleiro_cassio@mail.com",
-#             password="123546",
-#             first_name="Goleiro",
-#             last_name="Cassioo",
-#             is_provider=False,
-#             phone="1140028922",
-#         )
+class ReviewCreateViewTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.contractor = User.objects.create_user(
+            email="goleiro_cassio@mail.com",
+            password="123546",
+            first_name="Goleiro",
+            last_name="Cassioo",
+            is_provider=False,
+            phone="1140028922",
+        )
 
-#         cls.critic_token = Token.objects.create(user=cls.user_critic)
+        cls.contractor_token = Token.objects.create(user=cls.contractor)
 
-#         cls.user_criticized = User.objects.create_user(
-#             email="roni_calma@mail.com",
-#             password="123546",
-#             first_name="Roni",
-#             last_name="Calma",
-#             is_provider=True,
-#             phone="1189224002",
-#         )
+        cls.provider = User.objects.create_user(
+            email="roni_calma@mail.com",
+            password="123546",
+            first_name="Roni",
+            last_name="Calma",
+            is_provider=True,
+            phone="1189224002",
+        )
+        cls.provider_token = Token.objects.create(user=cls.provider)
 
-#     def test_create_review(self):
-#         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.critic_token.key}")
+        cls.service = Service.objects.create(
+            title="Concerto de pia",
+            description="Preciso de concerto na pia da cozinha da minha casa.",
+            price=80.00,
+            contractor=cls.contractor,
+            provider=cls.provider,
+        )
 
-#         request_body = {"stars": 5, "description": "Lorem ipsum dolor sit amet"}
+    def test_contractor_can_create_review(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.contractor_token.key}")
 
-#         response = self.client.post(
-#             f"/api/accounts/{self.user_criticized.id}/reviews/",
-#             request_body,
-#             format="json",
-#         )
+        request_body = {"stars": 5, "description": "Lorem ipsum dolor sit amet"}
 
-#         self.assertEqual(response.status_code, 201)
-#         self.assertIn(
-#             response.data, ReviewSerializer(Review.objects.all(), many=True).data
-#         )
+        response = self.client.post(
+            f"/api/services/{self.service.id}/reviews/",
+            request_body,
+            format="json",
+        )
 
-#     def test_incorret_create_review_fields(self):
-#         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.critic_token.key}")
+        self.assertEqual(response.status_code, 201)
+        self.assertIn(
+            response.data, ReviewSerializer(Review.objects.all(), many=True).data
+        )
 
-#         incorrect_data = {"stars": -5, "description": False}
+    def test_provider_can_create_review(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.provider_token.key}")
 
-#         serializer = ReviewSerializer(data=incorrect_data)
+        request_body = {"stars": 5, "description": "Lorem ipsum dolor sit amet"}
 
-#         self.assertEqual(serializer.is_valid(), False)
+        response = self.client.post(
+            f"/api/services/{self.service.id}/reviews/",
+            request_body,
+            format="json",
+        )
 
-#         response = self.client.post(
-#             f"/api/accounts/{self.user_criticized.id}/reviews/",
-#             incorrect_data,
-#             format="json",
-#         )
+        self.assertEqual(response.status_code, 201)
+        self.assertIn(
+            response.data, ReviewSerializer(Review.objects.all(), many=True).data
+        )
 
-#         self.assertEqual(response.status_code, 400)
-#         self.assertEqual(serializer._errors, response.data)
+    def test_incorret_create_review_fields(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.contractor_token.key}")
 
-#     def test_not_authenticated_error(self):
-#         request_body = {"stars": 5, "description": "Lorem ipsum dolor sit amet"}
+        incorrect_data = {"stars": -5, "description": False}
 
-#         response = self.client.post(
-#             f"/api/accounts/{self.user_criticized.id}/reviews/",
-#             request_body,
-#             format="json",
-#         )
+        serializer = ReviewSerializer(data=incorrect_data)
 
-#         self.assertEqual(response.status_code, 401)
-#         self.assertEqual(
-#             response.data, {"detail": "Authentication credentials were not provided."}
-#         )
+        self.assertEqual(serializer.is_valid(), False)
+
+        response = self.client.post(
+            f"/api/services/{self.service.id}/reviews/",
+            incorrect_data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(serializer._errors, response.data)
+
+    def test_not_authenticated_error(self):
+        request_body = {"stars": 5, "description": "Lorem ipsum dolor sit amet"}
+
+        response = self.client.post(
+            f"/api/services/{self.service.id}/reviews/",
+            request_body,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(
+            response.data, {"detail": "Authentication credentials were not provided."}
+        )
+
+    def test_not_related_user_cannot_create(self):
+        new_user = User.objects.create_user(
+            email="mano_magica@mail.com",
+            password="123546",
+            first_name="Mano",
+            last_name="Magica",
+            is_provider=False,
+            phone="1189224002",
+        )
+        new_user_token = Token.objects.create(user=new_user)
+
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {new_user_token.key}")
+
+        request_body = {"stars": 5, "description": "Lorem ipsum dolor sit amet"}
+
+        response = self.client.post(
+            f"/api/services/{self.service.id}/reviews/",
+            request_body,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            response.data,
+            {"detail": "You do not have permission to perform this action."},
+        )
 
 
 # class ReviewViewsTests(APITestCase):
