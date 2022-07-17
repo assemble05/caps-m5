@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "categories",
     "reviews",
     "services",
+    "documents"
 ]
 
 MIDDLEWARE = [
