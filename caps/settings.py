@@ -107,7 +107,7 @@ else:
             "NAME": os.environ.get("POSTGRES_DB"),
             "USER": os.environ.get("POSTGRES_USER"),
             "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-            "HOST": "localhost",
+            "HOST": "db",
             "PORT": 5432,
         }
     }
@@ -168,6 +168,7 @@ REST_FRAMEWORK = {
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'caps.pagination.CustomNumberPagination'
 }
 
 SPECTACULAR_SETTINGS = {
