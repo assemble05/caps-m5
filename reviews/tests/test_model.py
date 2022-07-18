@@ -1,6 +1,7 @@
 from django.db import IntegrityError
 from django.test import TestCase
 from reviews.models import Review
+from services.models import Service
 from users.models import User
 
 
@@ -30,11 +31,20 @@ class ReviewModelTest(TestCase):
             phone="1189224002",
         )
 
+        cls.service = Service.objects.create(
+            title="Concerto de pia",
+            description="Preciso de concerto na pia da cozinha da minha casa.",
+            price=80.00,
+            contractor=cls.contractor,
+            provider=cls.provider,
+        )
+
     def test_description_max_length_and_stars_default(self):
         review = Review.objects.create(
             description=self.description,
             user_critic=self.contractor,
             user_criticized=self.provider,
+            service=self.service,
         )
 
         max_length = review._meta.get_field("description").max_length
@@ -49,6 +59,7 @@ class ReviewModelTest(TestCase):
                 description=self.description,
                 user_critic=self.contractor,
                 user_criticized=self.provider,
+                service=self.service,
             )
 
     def test_review_fields_values(self):
@@ -57,12 +68,14 @@ class ReviewModelTest(TestCase):
             description=self.description,
             user_critic=self.contractor,
             user_criticized=self.provider,
+            service=self.service,
         )
 
         self.assertEqual(review.user_critic, self.contractor)
         self.assertEqual(review.user_criticized, self.provider)
         self.assertEqual(review.stars, self.stars)
         self.assertEqual(review.description, self.description)
+        self.assertEqual(review.service, self.service)
 
     def test_review_cannot_have_more_than_one_user_critic(self):
         review = Review.objects.create(
@@ -70,6 +83,7 @@ class ReviewModelTest(TestCase):
             description=self.description,
             user_critic=self.contractor,
             user_criticized=self.provider,
+            service=self.service,
         )
 
         contractor_two = User.objects.create_user(
@@ -93,6 +107,7 @@ class ReviewModelTest(TestCase):
             description=self.description,
             user_critic=self.contractor,
             user_criticized=self.provider,
+            service=self.service,
         )
 
         provider_two = User.objects.create_user(
@@ -109,3 +124,26 @@ class ReviewModelTest(TestCase):
 
         self.assertNotIn(review, self.provider.critics.all())
         self.assertIn(review, provider_two.critics.all())
+
+    def test_review_cannot_pertence_to_more_than_one_service(self):
+        review = Review.objects.create(
+            stars=self.stars,
+            description=self.description,
+            user_critic=self.contractor,
+            user_criticized=self.provider,
+            service=self.service,
+        )
+
+        service_two = Service.objects.create(
+            title="Limpeza de Garage,",
+            description="Preciso de alguem para limpar minha garagem empoeirada.",
+            price=50.00,
+            contractor=self.contractor,
+            provider=self.provider,
+        )
+
+        review.service = service_two
+        review.save()
+
+        self.assertNotIn(review, self.service.reviews.all())
+        self.assertIn(review, service_two.reviews.all())

@@ -12,7 +12,7 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    address = AddressSerializer()
+    address = AddressSerializer(required=False)
 
     class Meta:
         fields = [
@@ -26,16 +26,28 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "address",
         ]
         model = User
+        read_only_fields = ["address"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
-        address_data = validated_data.pop("address")
-        address , check= Address.objects.get_or_create(**address_data) 
-        user = User.objects.create_user(**validated_data,address=address)
-        
+        try:
+            address_data = validated_data.pop("address")
+            address , check= Address.objects.get_or_create(**address_data) 
+            user = User.objects.create_user(address=address,**validated_data)
+            return user
+        except:
+            user = User.objects.create_user(**validated_data)
+            return user
    
-        return user
+        # return user
 
+    def update(self, instance, validated_data):
+        for k, v in validated_data.items():
+            setattr(instance, k, v)
+        
+        instance.save()
+
+        return instance
 
 class UserSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
@@ -43,6 +55,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            "id",
             "first_name",
             "last_name",
             "is_provider",

@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from pyexpat import model
 
 
 # Create your models here.
@@ -11,11 +12,27 @@ class Service(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     is_active = models.BooleanField(default=True)
     is_delete = models.BooleanField(default=False)
-    id_provider = models.CharField(max_length=255, null=True)
 
-    address = models.OneToOneField(
-        "adresses.Address", on_delete=models.CASCADE, null=True
+    provider = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        related_name="worked_services",
+        null=True,
     )
+
+    contractor = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="created_services",
+    )
+
+    address = models.ForeignKey(
+        "adresses.Address", 
+        on_delete=models.CASCADE, 
+        related_name="services", 
+        null=True
+    )
+    
     category = models.ForeignKey(
         "categories.Category",
         on_delete=models.SET_NULL,

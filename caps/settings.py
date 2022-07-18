@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "categories",
     "reviews",
     "services",
+    "drf_spectacular"
 ]
 
 MIDDLEWARE = [
@@ -164,5 +165,14 @@ AUTH_USER_MODEL = "users.User"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
-    )
+    ),
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'caps-m5',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '0.1.0 alpha',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
