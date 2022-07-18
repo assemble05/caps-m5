@@ -26,16 +26,27 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "address",
         ]
         model = User
+        read_only_fields = ["address"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
-        address_data = validated_data.pop("address")
-        address , check= Address.objects.get_or_create(**address_data) 
-        user = User.objects.create_user(**validated_data,address=address)
+        try:
+            address_data = validated_data.pop("address")
+            address , check= Address.objects.get_or_create(**address_data) 
+            user = User.objects.create_user(**validated_data,address=address)
+        except:
+            user = User.objects.create_user(**validated_data)
         
    
         return user
 
+    def update(self, instance, validated_data):
+        for k, v in validated_data.items():
+            setattr(instance, k, v)
+        
+        instance.save()
+
+        return instance
 
 class UserSerializer(serializers.ModelSerializer):
     address = AddressSerializer()

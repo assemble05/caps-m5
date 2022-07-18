@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from users.models import User
+from utils.permissions import IsOwnerOrReadOnly, IsOwnerOrSuperUserOrReadOnly
 from users.serializers import (
     UserLoginSerializer,
     UserRegisterSerializer,
@@ -38,10 +39,9 @@ class ListCreateAccount(generics.ListCreateAPIView):
     serializer_class = UserRegisterSerializer
 
 
-class ListAccountDetail(generics.RetrieveAPIView):
-
+class ListAccountDetail(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrSuperUserOrReadOnly]
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
