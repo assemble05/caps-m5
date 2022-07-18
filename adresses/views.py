@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from rest_framework import generics
+from .models import Address
+from .serializers import AddressSerializer
 
-# Create your views here.
+
+class ListCreateAccount(generics.ListCreateAPIView):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
