@@ -6,7 +6,16 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields = ["id", "nome", "description"]
+        fields = ["id", "nome", "description, services, users"]
+
+    services = serializers.SerializerMethodField()
+    users = serializers.SerializerMethodField()
+
+    def get_services(self, category: Category):
+        return category.services.count()
+
+    def get_users(self, category: Category):
+        return category.providers.count()
 
     def create(self, validated_data: dict):
         return Category.objects.create(**validated_data)
