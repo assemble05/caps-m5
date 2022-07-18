@@ -39,6 +39,7 @@ class ListCreateAccount(generics.ListCreateAPIView):
     serializer_class = UserRegisterSerializer
 
 
+
 class ListAccountDetail(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerOrSuperUserOrReadOnly]

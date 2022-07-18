@@ -12,7 +12,7 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    address = AddressSerializer()
+    address = AddressSerializer(required=False)
 
     class Meta:
         fields = [
@@ -33,12 +33,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         try:
             address_data = validated_data.pop("address")
             address , check= Address.objects.get_or_create(**address_data) 
-            user = User.objects.create_user(**validated_data,address=address)
+            user = User.objects.create_user(address=address,**validated_data)
+            return user
         except:
             user = User.objects.create_user(**validated_data)
-        
+            return user
    
-        return user
+        # return user
 
     def update(self, instance, validated_data):
         for k, v in validated_data.items():

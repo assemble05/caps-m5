@@ -1,8 +1,10 @@
 from django.urls import path
+from .views import ListCreateAddress, AddressDetailView
 
 
 
 
 urlpatterns = [
-    path('adresses/<pk>', ListCreateAccount.as_view(), name="list_create_user"),
+    path('address/', ListCreateAddress.as_view(), name="create_address"),
+    path('address/<pk>/', AddressDetailView.as_view(), name="address_detail_view"),
 ]
