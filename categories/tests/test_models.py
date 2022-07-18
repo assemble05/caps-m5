@@ -23,9 +23,9 @@ class CategoryModelTest(TestCase):
 
     def test_creation_category(self):
         category = Category.objects.create(
-            nome=self.nome
+            nome=self.nome,
             description=self.description
         )
 
-        self.assertEqual(category.nome, self.description)
+        self.assertEqual(category.nome, self.nome)
         self.assertEqual(category.description, self.description)
