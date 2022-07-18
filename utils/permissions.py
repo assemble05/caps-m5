@@ -13,7 +13,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 class IsOwnerOrSuperUserOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        ipdb.set_trace()
         if request.method in permissions.SAFE_METHODS:
             return True
         
