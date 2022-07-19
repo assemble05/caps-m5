@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
-from rest_framework.permissions import isAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from caps.pagination import CustomNumberPagination
 from services.models import Service
@@ -30,6 +29,6 @@ class ListServiceView(generics.ListAPIView):
 
 class ServiceRetrieveUpdateDeleteView(SerializerByMethodMixin, generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [isAuthenticated, OwnerOrAdmPermission]
+    permission_classes = [OwnerOrAdmPermission]
     queryset =  Service.objects.all()
     serializer_class = ServiceSerializer
