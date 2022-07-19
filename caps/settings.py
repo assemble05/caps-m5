@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     "categories",
     "reviews",
     "services",
-    "drf_spectacular"
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -166,13 +166,14 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
     ),
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PAGINATION_CLASS": "caps.pagination.CustomNumberPagination",
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'caps-m5',
-    'DESCRIPTION': 'Your project description',
-    'VERSION': '0.1.0 alpha',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "caps-m5",
+    "DESCRIPTION": "Your project description",
+    "VERSION": "0.1.0 alpha",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
