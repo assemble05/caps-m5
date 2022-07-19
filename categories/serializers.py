@@ -6,7 +6,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields = ["id", "nome", "description, services, users"]
+        fields = ["id", "nome", "description", "services", "users"]
 
     services = serializers.SerializerMethodField()
     users = serializers.SerializerMethodField()
