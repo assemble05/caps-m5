@@ -11,7 +11,7 @@ from users.serializers import (
     UserLoginSerializer,
     UserRegisterSerializer,
     UserSerializer,
-    UserProviderSerializer
+   
 )
 
 
@@ -51,7 +51,7 @@ class ListAccountDetail(generics.RetrieveUpdateDestroyAPIView):
 class ListAccountProvider(generics.ListAPIView):
     
     queryset = User.objects.all()
-    serializer_class = UserProviderSerializer
+    serializer_class = UserSerializer
 
     def get_queryset(self):
         return self.queryset.filter(is_provider=True)
