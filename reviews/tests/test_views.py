@@ -183,7 +183,8 @@ class ReviewViewsTests(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            [ReviewSerializer(instance=self.first_review).data], response.data
+            [ReviewSerializer(instance=self.first_review).data],
+            response.data["results"],
         )
 
     def test_anyone_can_list_one_user_created_reviews(self):
@@ -193,7 +194,8 @@ class ReviewViewsTests(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            [ReviewSerializer(instance=self.first_review).data], response.data
+            [ReviewSerializer(instance=self.first_review).data],
+            response.data["results"],
         )
 
     def test_auth_user_can_filter(self):
