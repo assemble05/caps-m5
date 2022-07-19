@@ -2,6 +2,7 @@ import ipdb
 from adresses.models import Address
 from adresses.serializers import AddressSerializer
 from rest_framework import serializers
+from reviews.models import Review
 
 from users.models import User
 
@@ -49,9 +50,18 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
         return instance
 
-class UserSerializer(serializers.ModelSerializer):
-    address = AddressSerializer()
+class ReviewUserSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = Review
+        fields = [
+            "stars",
+            "description",
+        ]
+
+class UserSerializer(serializers.ModelSerializer):
+    critics = ReviewUserSerializer(many=True)
+    address = AddressSerializer()
     class Meta:
         model = User
         fields = [
@@ -63,4 +73,6 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "address",
             "phone",
+            "critics",
         ]
+    

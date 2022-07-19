@@ -29,4 +29,4 @@ class CustomUserManager(BaseUserManager):
         return self._create_user(email, password, False, False, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
-        return self._create_user(email, password, True, True, False,**extra_fields)
+        return self._create_user(email, password, True, True, True,**extra_fields)
