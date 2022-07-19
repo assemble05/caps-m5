@@ -19,7 +19,7 @@ class User(AbstractUser):
     description = models.CharField(max_length=255, null=True)
 
     address = models.OneToOneField(
-        "adresses.Address", on_delete=models.CASCADE, null=True
+        "adresses.Address", on_delete=models.CASCADE, null=True, related_name="user"
     )
 
     USERNAME_FIELD = "email"
