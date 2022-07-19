@@ -33,6 +33,9 @@ class AddressDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AddressSerializer
 
 class AddresServiceView(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
 
@@ -43,6 +46,9 @@ class AddresServiceView(generics.ListAPIView):
         return self.queryset.filter(address=addressf)
 
 class AddressUserView(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
