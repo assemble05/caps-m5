@@ -75,7 +75,7 @@ class CategoryUsersView(APIView, PageNumberPagination):
     authentication_classes = [TokenAuthentication]
     permission_classes = [CategoryPermission]
     def get(self, request, category_id):
-        list_users = User.objects.filter(category_id = category_id)
+        list_users = User.objects.filter(categories = category_id)
         result_page = self.paginate_queryset(list_users, request, view = self)
         serializer = UsersSerializer(result_page, many = True)
         return self.get_paginated_response(serializer.data)
