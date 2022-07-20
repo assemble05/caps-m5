@@ -33,14 +33,24 @@ class ServiceSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
+            "category",
             "description",
             "price",
             "contractor",
+            "provider",
             "address",
             "category_id",
             "provider_id",
-            "category",
         ]
+
+    provider = serializers.SerializerMethodField()
+
+    def get_provider(self, service: Service):
+
+        if service.provider:
+            return UserSerializer(instance=service.provider).data
+
+        return None
 
     def create(self, validated_data: dict):
         """
