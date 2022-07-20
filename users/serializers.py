@@ -17,10 +17,14 @@ class UserLoginSerializer(serializers.Serializer):
 class CatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = "__all__"
+        fields = ["nome", "description"]
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
-    address = AddressSerializer(required=False)
-    # categories = CatSerializer(allow_null=True, required=False,many=True)
+    address = AddressSerializer()
+    categories = serializers.SerializerMethodField()
+    categories_id = serializers.ListField(write_only=True, required=False)
+
     class Meta:
         fields = [
             "id",
@@ -31,20 +35,31 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "description",
             "email",
             "address",
-            "categories"
+            "categories",
+            "categories_id",
         ]
         model = User
-        read_only_fields = ["address"]
-        extra_kwargs = {"password": {"write_only": True}}
+        read_only_fields = ["categories"]
+        extra_kwargs = {
+            "password": {"write_only": True},
+            "categories_id": {"write_only": True},
+        }
+
+    def get_categories(self, obj: User):
+        return CatSerializer(obj.categories.all(), many=True).data
 
     def create(self, validated_data: dict):
 
         address_data = validated_data.pop("address")
-        categories_data = validated_data.pop("categories")
         address = Address.objects.create(**address_data)
+
+        if "categories_id" in validated_data.keys():
+            categories_data = validated_data.pop("categories_id")
+            user = User.objects.create_user(address=address, **validated_data)
+            user.categories.set(categories_data)
+            return user
+
         user = User.objects.create_user(address=address, **validated_data)
-        user.categories.set(categories_data)
-       
 
         return user
 
@@ -67,8 +82,9 @@ class ReviewUserSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    critics = ReviewUserSerializer(many=True)
+    critics = serializers.SerializerMethodField()
     address = AddressSerializer()
+    review_score = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -82,4 +98,16 @@ class UserSerializer(serializers.ModelSerializer):
             "address",
             "phone",
             "critics",
+            "review_score"
         ]
+    
+    def get_review_score(self, obj):
+        total = 0
+        if obj.critics.count() == 0:
+            return None
+        for star in obj.critics.all():
+            total += star.stars
+        return total/obj.critics.count()
+    
+    def get_critics(self, obj):
+        return obj.critics.count()
