@@ -15,7 +15,7 @@ from users.models import User
 from users.serializers import UserSerializer
 
 
-class CategoryView(APIView, PageNumberPagination):
+class CategoryView(PageNumberPagination, APIView ):
     authentication_classes = [TokenAuthentication]
     permission_classes = [CategoryPermission]
     def post(self, request):
@@ -77,5 +77,5 @@ class CategoryUsersView(APIView, PageNumberPagination):
     def get(self, request, category_id):
         list_users = User.objects.filter(categories = category_id)
         result_page = self.paginate_queryset(list_users, request, view = self)
-        serializer = UsersSerializer(result_page, many = True)
+        serializer = UserSerializer(result_page, many = True)
         return self.get_paginated_response(serializer.data)
