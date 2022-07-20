@@ -1,10 +1,12 @@
 import ipdb
+from pkg_resources import require
 from adresses.models import Address
 from adresses.serializers import AddressSerializer
 from rest_framework import serializers
 from reviews.models import Review
-
+from categories.models import Category
 from users.models import User
+from categories.serializers import CategorySerializer
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -12,9 +14,13 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
 
+class CatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
 class UserRegisterSerializer(serializers.ModelSerializer):
     address = AddressSerializer(required=False)
-
+    # categories = CatSerializer(allow_null=True, required=False)
     class Meta:
         fields = [
             "id",
@@ -24,34 +30,31 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "is_provider",
             "description",
             "email",
-            "address",
+            "address"
         ]
         model = User
-        read_only_fields = ["address"]
+        read_only_fields = ["address","categories"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
-        try:
-            address_data = validated_data.pop("address")
-            address , check= Address.objects.get_or_create(**address_data) 
-            user = User.objects.create_user(address=address,**validated_data)
-            return user
-        except:
-            user = User.objects.create_user(**validated_data)
-            return user
-   
-        # return user
+
+        address_data = validated_data.pop("address")
+        address = Address.objects.create(**address_data)
+        user = User.objects.create_user(address=address, **validated_data)
+
+
+        return user
 
     def update(self, instance, validated_data):
         for k, v in validated_data.items():
             setattr(instance, k, v)
-        
+
         instance.save()
 
         return instance
 
-class ReviewUserSerializer(serializers.ModelSerializer):
 
+class ReviewUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = [
@@ -59,9 +62,11 @@ class ReviewUserSerializer(serializers.ModelSerializer):
             "description",
         ]
 
+
 class UserSerializer(serializers.ModelSerializer):
     critics = ReviewUserSerializer(many=True)
     address = AddressSerializer()
+
     class Meta:
         model = User
         fields = [
@@ -75,4 +80,3 @@ class UserSerializer(serializers.ModelSerializer):
             "phone",
             "critics",
         ]
-    
