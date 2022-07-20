@@ -6,7 +6,6 @@ from services.models import Service
 from services.permissions import OwnerOrAdmPermission
 from services.serializers import ServiceSerializer
 from services.utils.mixins import SerializerByMethodMixin
-
 from users.models import User
 
 
