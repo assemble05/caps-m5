@@ -20,7 +20,7 @@ class CatSerializer(serializers.ModelSerializer):
         fields = "__all__"
 class UserRegisterSerializer(serializers.ModelSerializer):
     address = AddressSerializer(required=False)
-    # categories = CatSerializer(allow_null=True, required=False)
+    # categories = CatSerializer(allow_null=True, required=False,many=True)
     class Meta:
         fields = [
             "id",
@@ -30,18 +30,21 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "is_provider",
             "description",
             "email",
-            "address"
+            "address",
+            "categories"
         ]
         model = User
-        read_only_fields = ["address","categories"]
+        read_only_fields = ["address"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
 
         address_data = validated_data.pop("address")
+        categories_data = validated_data.pop("categories")
         address = Address.objects.create(**address_data)
         user = User.objects.create_user(address=address, **validated_data)
-
+        user.categories.set(categories_data)
+       
 
         return user
 
