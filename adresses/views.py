@@ -42,7 +42,6 @@ class AddresServiceView(generics.ListAPIView):
     def get_queryset(self):
         addressid = self.kwargs.get("pk")
         addressf = Address.objects.get(id=addressid)
-        ipdb.set_trace()
         return self.queryset.filter(address=addressf)
 
 class AddressUserView(generics.ListAPIView):
