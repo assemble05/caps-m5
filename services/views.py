@@ -6,8 +6,18 @@ from rest_framework.permissions import IsAuthenticated
 from users.models import User
 
 from services.models import Service
-from services.permissions import IsProviderPermission, OwnerOrAdmPermission
-from services.serializers import CandidateToServiceSerializer, ServiceSerializer
+from services.permissions import (
+    GetServiceOwnerOrAdmPermission,
+    IsProviderPermission,
+    ListContractorServicesPermission,
+)
+from services.serializers import (
+    CandidateToServiceSerializer,
+    ListContractorServiceSerializer,
+    ListProviderServiceSerializer,
+    ServiceSerializer,
+    ShowServiceSerializer,
+)
 from services.utils.mixins import SerializerByMethodMixin
 
 
@@ -20,17 +30,46 @@ class ServiceView(generics.CreateAPIView):
 
 
 class ListServiceView(generics.ListAPIView):
-    permission_classes = [OwnerOrAdmPermission]
-    queryset = Service.objects.all()
-    serializer_class = ServiceSerializer
+    permission_classes = [IsAuthenticated]
     pagination_class = CustomNumberPagination
 
+    serializer_class = CandidateToServiceSerializer
 
-class ServiceRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    def get_queryset(self):
+        return Service.objects.filter(is_active=True)
+
+
+class ListContractorServicesView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated, ListContractorServicesPermission]
+
+    serializer_class = ListContractorServiceSerializer
+
+    def get_queryset(self):
+        return Service.objects.filter(contractor=self.request.user)
+
+
+class ListProviderServicesView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    serializer_class = ListProviderServiceSerializer
+
+    def get_queryset(self):
+        provider = get_object_or_404(User, pk=self.kwargs["provider_id"])
+        return Service.objects.filter(provider=provider)
+
+
+class ServiceRetrieveUpdateDeleteView(
+    SerializerByMethodMixin, generics.RetrieveUpdateDestroyAPIView
+):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [OwnerOrAdmPermission]
+    permission_classes = [GetServiceOwnerOrAdmPermission]
+
     queryset = Service.objects.all()
-    serializer_class = ServiceSerializer
+    serializer_map = {
+        "GET": ShowServiceSerializer,
+        "PATCH": ServiceSerializer,
+        "DELETE": ServiceSerializer,
+    }
 
 
 class CandidateToServiceView(generics.UpdateAPIView):

@@ -53,14 +53,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         return None
 
     def create(self, validated_data: dict):
-        """
-        Quero gravar o address
-        - se não tiver irá pegar no contrante
-        - se tiver address tem que verificar se o number e o zipCode
-            - se é igual algum address pegar esse id.
-            - se não cria outro
 
-        """
         category = Category.objects.get(id=validated_data["category_id"])
         if "address" in validated_data.keys():
             address_data = validated_data.pop("address")
@@ -132,19 +125,19 @@ class CandidateToServiceSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
+            "category",
             "description",
             "price",
             "contractor",
             "address",
-            "category",
             "candidates",
         ]
 
     candidates = serializers.SerializerMethodField()
 
     def get_candidates(self, service: Service):
-
-        return UserSerializer(service.candidates.all(), many=True).data
+        # UserSerializer(service.candidates.all(), many=True).data
+        return service.candidates.count()
 
     def update(self, instance, validated_data):
         candidate = validated_data.pop("candidate")
@@ -152,3 +145,103 @@ class CandidateToServiceSerializer(serializers.ModelSerializer):
         instance.candidates.add(candidate)
         instance.save()
         return instance
+
+
+class ListContractorServiceSerializer(serializers.ModelSerializer):
+    contractor = UserSerializer(read_only=True)
+    address = AddressSerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = Service
+        fields = [
+            "id",
+            "title",
+            "category",
+            "description",
+            "price",
+            "contractor",
+            "provider",
+            "address",
+            "candidates",
+        ]
+
+    candidates = serializers.SerializerMethodField()
+
+    def get_candidates(self, service: Service):
+        return service.candidates.count()
+
+    provider = serializers.SerializerMethodField()
+
+    def get_provider(self, service: Service):
+
+        if service.provider:
+            return UserSerializer(instance=service.provider).data
+
+        return None
+
+
+class ListProviderServiceSerializer(serializers.ModelSerializer):
+    contractor = UserSerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = Service
+        fields = [
+            "id",
+            "title",
+            "category",
+            "description",
+            "contractor",
+            "provider",
+        ]
+
+    provider = serializers.SerializerMethodField()
+
+    def get_provider(self, service: Service):
+
+        if service.provider:
+            return UserSerializer(instance=service.provider).data
+
+        return None
+
+
+class ShowServiceSerializer(serializers.ModelSerializer):
+    contractor = UserSerializer(read_only=True)
+    address = AddressSerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = Service
+        fields = [
+            "id",
+            "title",
+            "category",
+            "description",
+            "price",
+            "contractor",
+            "provider",
+            "address",
+            "candidates",
+        ]
+
+    candidates = serializers.SerializerMethodField()
+
+    def get_candidates(self, service: Service):
+
+        if (
+            self._context["request"].user == service.contractor
+            or self._context["request"].user.is_superuser
+        ):
+            return UserSerializer(service.candidates.all(), many=True).data
+
+        return service.candidates.count()
+
+    provider = serializers.SerializerMethodField()
+
+    def get_provider(self, service: Service):
+
+        if service.provider:
+            return UserSerializer(instance=service.provider).data
+
+        return None
