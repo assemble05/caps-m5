@@ -1,9 +1,8 @@
-from rest_framework.test import APITestCase
-from rest_framework.views import status
-from rest_framework.authtoken.models import Token
-import ipdb
 from adresses.models import Address
 from adresses.serializers import AddressSerializer
+from categories.models import Category
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
 from users.models import User
 
 
@@ -11,46 +10,46 @@ class AccountViewsTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
 
-        cls.user_data1 = {
-            "first_name": "Gordon",
-            "last_name": "Charlie",
-            "email": "gordoncharlie@mail.com",
-            "phone": 123432321,
-            "password": "123",
-            "description": "sou legal"
-        }
-        cls.adrr = {
-                "country" : "brasil",
-                "state" : "sp",
-                "city" : "sp",
-                "street" : "casa do pardal2",
-                "number" : 32,
-                "complement" : "house",
-                "zip_code" : 1245234534
-            }
- 
-        cls.login = {"password": "123", "email": "gordoncharlie@mail.com"}
+        cls.contractor = User.objects.create_user(
+            email="goleiro_cassio@mail.com",
+            password="123546",
+            first_name="Goleiro",
+            last_name="Cassioo",
+            is_provider=False,
+            phone="1140028922",
+        )
+        cls.contractor_token = Token.objects.create(user=cls.contractor)
+
+        cls.address = Address.objects.create(
+            country="brasil",
+            state="sp",
+            city="sp",
+            street="casa do pardal2",
+            number=32,
+            complement="house",
+            zip_code=1245234534,
+        )
+
+        cls.category = Category.objects.create(
+            nome="Limpeza", description="Limpeza de casa e prédios"
+        )
+
         cls.service_info = {
             "title": "limpar calha",
             "description": "tem que limpar a calha muito bem ",
-            "price": 200
+            "price": 200,
+            "category_id": cls.category.id,
         }
 
     def test_create_service(self):
-        
-        adrr_create = Address.objects.create(**self.adrr)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.contractor_token.key}")
+        serializer = AddressSerializer(instance=self.address)
+        self.service_info["address"] = serializer.data
 
-        usert_create = User.objects.create_user(**self.user_data1)
-
-        user_login = Token.objects.create(user=usert_create)
-
-        self.client.credentials(HTTP_AUTHORIZATION="Token" + " " + user_login.key)
-        seri  = AddressSerializer(instance=adrr_create)
-        self.service_info["address"] = seri.data
-        
-        res_user = self.client.post(
-            f'/api/accounts/{usert_create.__dict__["id"]}/service/',
-            data=self.service_info,
+        response = self.client.post(
+            f"/api/accounts/{self.contractor.id}/service/",
+            self.service_info,
+            format="json",
         )
 
-        self.assertEqual(res_user.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, 201)
