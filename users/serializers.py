@@ -17,7 +17,7 @@ class UserLoginSerializer(serializers.Serializer):
 class CatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = "__all__"
+        fields = ["nome", "description"]
 class UserRegisterSerializer(serializers.ModelSerializer):
     address = AddressSerializer(required=False)
     # categories = CatSerializer(allow_null=True, required=False,many=True)
@@ -38,12 +38,16 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
-
-        address_data = validated_data.pop("address")
-        categories_data = validated_data.pop("categories")
-        address = Address.objects.create(**address_data)
-        user = User.objects.create_user(address=address, **validated_data)
-        user.categories.set(categories_data)
+        try:
+            address_data = validated_data.pop("address")
+            categories_data = validated_data.pop("categories")
+            address = Address.objects.create(**address_data)
+            user = User.objects.create_user(address=address, **validated_data)
+            user.categories.set(categories_data)
+        except:
+            categories_data = validated_data.pop("categories")
+            user = User.objects.create_user(**validated_data)
+            user.categories.set(categories_data)
        
 
         return user
