@@ -47,7 +47,7 @@ class AccountViewsTest(APITestCase):
         self.service_info["address"] = serializer.data
 
         response = self.client.post(
-            f"/api/accounts/{self.contractor.id}/service/",
+            f"/api/service/",
             self.service_info,
             format="json",
         )

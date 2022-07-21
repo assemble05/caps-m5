@@ -30,3 +30,8 @@ class ListContractorServicesPermission(permissions.BasePermission):
         view_user = User.objects.get(id=view.kwargs["contractor_id"])
 
         return request.user.is_provider == False and request.user == view_user
+
+
+class CreateServicePermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_provider == False

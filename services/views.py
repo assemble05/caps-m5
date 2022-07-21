@@ -7,6 +7,7 @@ from users.models import User
 
 from services.models import Service
 from services.permissions import (
+    CreateServicePermission,
     GetServiceOwnerOrAdmPermission,
     IsProviderPermission,
     ListContractorServicesPermission,
@@ -22,11 +23,12 @@ from services.utils.mixins import SerializerByMethodMixin
 
 
 class ServiceView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, CreateServicePermission]
+
     serializer_class = ServiceSerializer
 
     def perform_create(self, serializer):
-        contractor = get_object_or_404(User, pk=self.kwargs["id_user"])
-        serializer.save(contractor=contractor)
+        serializer.save(contractor=self.request.user)
 
 
 class ListServiceView(generics.ListAPIView):
