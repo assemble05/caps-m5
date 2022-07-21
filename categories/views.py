@@ -1,6 +1,6 @@
 from rest_framework.views import APIView, Response
 from rest_framework import status
-from rest_framework.pagination import PageNumberPagination
+from caps.pagination import CustomNumberPagination
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -15,7 +15,7 @@ from users.models import User
 from users.serializers import UserSerializer
 
 
-class CategoryView(PageNumberPagination, APIView ):
+class CategoryView(CustomNumberPagination, APIView ):
     authentication_classes = [TokenAuthentication]
     permission_classes = [CategoryPermission]
     def post(self, request):
@@ -62,7 +62,7 @@ class CategoryIdView(APIView):
         category.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class CategoryServicesView(APIView, PageNumberPagination):
+class CategoryServicesView(APIView, CustomNumberPagination):
     authentication_classes = [TokenAuthentication]
     permission_classes = [CategoryPermission]
     def get(self, request, category_id):
@@ -71,7 +71,7 @@ class CategoryServicesView(APIView, PageNumberPagination):
         serializer = ServiceSerializer(result_page, many = True)
         return self.get_paginated_response(serializer.data)
 
-class CategoryUsersView(APIView, PageNumberPagination):
+class CategoryUsersView(APIView, CustomNumberPagination):
     authentication_classes = [TokenAuthentication]
     permission_classes = [CategoryPermission]
     def get(self, request, category_id):
